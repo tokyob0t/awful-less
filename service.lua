@@ -28,7 +28,6 @@ end
 ---Turn a GObject.Object into a gears.object
 ---@generic T
 ---@param object GObject.Object | T
----@return GObject.Object | T | Service
 Service.gearsify = function(object)
 	local new_gobject = gears.object({})
 
