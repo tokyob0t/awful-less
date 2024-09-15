@@ -59,6 +59,7 @@ end
 ---@return wibox.widget | Widget
 Widget.new = function(args)
 	local new_widget = { widget = args.widget, layout = args.layout }
+
 	args.widget, args.layout = nil, nil
 	args.setup = args.setup or function() end
 
@@ -75,30 +76,30 @@ Widget.new = function(args)
 
 	local children = {}
 
-	for index, value in next, args do
+	for key, value in pairs(args) do
 		local value_type = type(value)
-		if value_type == "table" then
-			if value.transform_fn then -- Binding
-				new_widget:bind(index, value.emitter, value.prop, value.transform_fn)
-			elseif value.widget or value.layout then -- widget / layout
-				if value.connect_signal then -- already a widget
+		if value_type == "table" then -- childrens / widget / binding
+			if value.transform_fn then -- binding
+				new_widget:bind(key, value.emitter, value.prop, value.transform_fn)
+			elseif value.widget or value.layout or value.children then
+				if value.connect_signal then -- already a widget / layout
 					children[#children + 1] = value
 				else
 					children[#children + 1] = Widget.new(value)
 				end
-			else
-				new_widget[index] = value
+			else -- children
+				new_widget[key] = value
 			end
-		elseif index == "on_hover" then
+		elseif key == "on_hover" then
 			new_widget:connect_signal("mouse::enter", value)
-		elseif index == "on_hoverlost" then
+		elseif key == "on_hoverlost" then
 			new_widget:connect_signal("mouse::leave", value)
-		elseif index == "on_click" then
+		elseif key == "on_click" then
 			new_widget:connect_signal("button::press", value)
-		elseif index == "on_release" then
-			new_widget:connect_signal("buton::release", value)
+		elseif key == "on_release" then
+			new_widget:connect_signal("button::release", value)
 		else
-			new_widget[index] = value
+			new_widget[key] = value
 		end
 	end
 

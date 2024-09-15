@@ -2,13 +2,15 @@
 
 ags-like thing for awm, making widget design less awful
 
-### installation
+### Installation
 
 ```sh
 git clone https://github.com/tokyob0t/awful-less.git ~/.config/awesome/awful-less
 ```
 
-### usage
+### Usage
+
+#### Widget
 
 ```lua
 local wibox = require("wibox")
