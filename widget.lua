@@ -58,9 +58,9 @@ end
 ---@param args table | { on_hover: fun(self: wibox.widget, on_hoverlost: fun(self: wibox.widget)), on_press: fun(self: wibox.widget), on_release: fun(self: wibox.widget), setup: fun(self: wibox.widget): nil}
 ---@return wibox.widget | Widget
 Widget.new = function(args)
-	local new_widget = { widget = args.widget, layout = args.layout }
+	local new_widget = { widget = args.widget, layout = args.layout, fit = args.fit, draw = args.draw }
 
-	args.widget, args.layout = nil, nil
+	args.widget, args.layout, args.fit, args.draw = nil, nil, nil, nil
 	args.setup = args.setup or function() end
 
 	for key, value in pairs(args) do
