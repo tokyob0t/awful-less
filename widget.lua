@@ -15,11 +15,30 @@ end
 local Widget = {}
 Widget.__index = Widget
 
+---@generic T
+---@param self T
 ---@param gobject gears.object | Binding
----@param callback fun(self, ...:any)
----@param signal string
----@return self
-Widget.hook = function(self, gobject, callback, signal)
+---@param ... string | fun(T, ...:any): nil
+---@return T
+Widget.hook = function(self, gobject, ...)
+	local args = { ... }
+
+	---@type fun(T, ...:any): nil
+	local callback
+	---@type string
+	local signal
+
+	if type(args[1]) == "function" and type(args[2]) == "nil" then
+		signal = "property::value"
+		callback = args[1]
+	elseif type(args[1] == "function") and type(args[2]) == "string" then
+		error("Please use Widget:hook(gobject, signal, callback), not Widget:hook(gobject, callback, signal)")
+		return self
+	else
+		signal = args[1]
+		callback = args[2]
+	end
+
 	signal = string.gsub(signal, "_", "-")
 
 	-- local on_disconnect
@@ -38,25 +57,31 @@ Widget.hook = function(self, gobject, callback, signal)
 	return self
 end
 
----@param prop string
+---@generic T
+---@param self T
+---@param self_prop string
 ---@param gobject gears.object | Binding
 ---@param gobject_prop? string
 ---@param fn? fun(v: any): any
----@return self
-Widget.bind = function(self, prop, gobject, gobject_prop, fn)
+---@return T
+Widget.bind = function(self, self_prop, gobject, gobject_prop, fn)
 	gobject_prop = gobject_prop or "value"
 
 	fn = fn or function(v)
 		return v
 	end
 
-	return self:hook(gobject, function()
-		self[prop] = fn(gobject[gobject_prop])
-	end, "property::" .. gobject_prop)
+	return self:hook(gobject, "property::" .. gobject_prop, function()
+		self[self_prop] = fn(gobject[gobject_prop])
+	end)
 end
 
----@param args table | { on_hover: fun(self: wibox.widget, on_hoverlost: fun(self: wibox.widget)), on_press: fun(self: wibox.widget), on_release: fun(self: wibox.widget), setup: fun(self: wibox.widget): nil}
----@return wibox.widget | Widget
+---@generic T
+---@param args
+---| table
+---| { widget : T}
+---| { on_hover: fun(self: T, on_hoverlost: fun(self: T)), on_press: fun(self: T), on_release: fun(self: T), setup: fun(self: T): nil}
+---@return T | Widget
 Widget.new = function(args)
 	local new_widget = { widget = args.widget, layout = args.layout, fit = args.fit, draw = args.draw }
 

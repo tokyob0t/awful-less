@@ -11,7 +11,15 @@ local Variable = {}
 ---@param value any
 ---@return Variable
 Variable.new = function(value)
-	local self = gears.object({ enable_properties = true, class = setmetatable({}, { __index = Variable }) })
+	local self = gears.object({
+		enable_properties = true,
+		class = setmetatable({}, {
+			__index = Variable,
+			__call = function(mt)
+				return mt:bind()
+			end,
+		}),
+	})
 	self.value = value
 
 	return self
@@ -33,10 +41,10 @@ Variable.set_value = function(self, new_value)
 	return self:emit_signal("property::value", self._value)
 end
 
----@return nil
-Variable.destroy = function(self)
-	return self:emit_signal("destroy")
-end
+-- ---@return nil
+-- Variable.destroy = function(self)
+-- 	return self:emit_signal("destroy")
+-- end
 
 ---@return Binding
 Variable.bind = function(self)
