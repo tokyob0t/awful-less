@@ -1,6 +1,6 @@
 # awful-less
 
-ags-like thing for awm, making widget design less awful
+ags/astal-like thing for awm, making widget design less awful
 
 ### Installation
 
@@ -29,5 +29,11 @@ local battery_percentage = Widget.new({
 	text = battery:bind("percentage"):as(function(v)
 		return string.format("%d%%", v * 100)
 	end),
+	-- or
+	-- setup = function(self)
+	-- 	self:hook(battery, "percentage", function()
+	-- 		self.text = string.format("%d%%", battery.percentage * 100)
+	-- 	end)
+	-- end,
 })
 ```
