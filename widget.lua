@@ -11,13 +11,22 @@ local idle = function(callback)
 	end)
 end
 
+local contains = function(item, tb)
+	for _, value in ipairs(tb) do
+		if item == value then
+			return true
+		end
+	end
+	return false
+end
+
 ---@class Widget: wibox.widget
 local Widget = {}
 Widget.__index = Widget
 
 ---@generic T
 ---@param self T
----@param gobject gears.object | Binding
+---@param gobject gears.object  | Binding
 ---@param ... string | fun(T, ...:any): nil
 ---@return T
 Widget.hook = function(self, gobject, ...)
@@ -47,7 +56,18 @@ Widget.hook = function(self, gobject, ...)
 	-- 	gobject:disconnect_signal("destroy", on_disconnect)
 	-- end
 
-	gobject:connect_signal(signal, callback)
+	if contains(gobject, {
+		awesome,
+		client,
+		screen,
+		tag,
+		mouse,
+		root,
+	}) then
+		gobject.connect_signal(signal, callback)
+	else
+		gobject:connect_signal(signal, callback)
+	end
 	--gobject:connect_signal("destroy", on_disconnect)
 
 	idle(function()
